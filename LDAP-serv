@@ -34,7 +34,8 @@
  	
  	chown -R ldap:ldap /var/lib/ldap
  	echo "Coping finished"
- 	 
+  
+ 	#Create LDAP password
  	#change >> to echo command
  	slappasswd >> LDAPcapture.txt #we need to capture output of this command
  	
