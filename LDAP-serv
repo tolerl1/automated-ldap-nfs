@@ -1,36 +1,52 @@
 #!/bin/bash
-#Project 2
-#Author/Creator by Zachary Brewer & Loagn Toler
-#Team 2
-#LDAP Instillation
-
-
-#store files in /etc/openldap/slapd.d
-
-
-#setsebool -P allow_ypbind=0 authlogin_nsswitch_use_ldap=0 (disables selinux auth)
-
-#Install LDAP
-yum -y install openldap-servers openldap-clients
-
-#Starts LDAP and enables it to start on boot
-systemctl enable slapd.service
-systemctl start slapd.service
-
-#change >> to echo command
-slappasswd >> LDAPcapture.txt    #we need to capture output of this command
-
-
-#Copy DB_CONFIG from usr to var
-cp /usr/share/openldap-servers/DB_CONFIG.example /var/lib/ldap/DB_CONFIG
-chown -R ldap:ldap /var/lib/ldap 
-
-#ldaprootpasswd.ldif
-dn: olcDatabase={0}config,cn=config
-changetype: modify
-add: olcRootPW
-olcRootPW: {SSHA}###########
-#password goes at #
-
+ 	#Project 2
+ 	#Author/Creator by Zachary Brewer & Loagn Toler
+ 	#Team 2
+ 	#LDAP Instillation
+ 	 
+ 	 
+ 	#store files in /etc/openldap/slapd.d
+ 	 
+ 	 
+ 	#setsebool -P allow_ypbind=0 authlogin_nsswitch_use_ldap=0 (disables selinux auth)
+ 	 
+ 	#Install LDAP
+ 	<<<<<<< patch-2
+ 	echo "Installing openldap..."
+ 	yum install openldap-servers openldap-clients -y
+ 	echo "Installation Complete!"
+ 	=======
+ 	yum -y install openldap-servers openldap-clients
+ 	>>>>>>> master
+ 	 
+ 	#Starts LDAP and enables it to start on boot
+ 	echo "Starting slapd.services..."
+ 	systemctl enable slapd.service
+ 	systemctl start slapd.service
+ 	echo "`slapd.services status`"
+ 	 
+ 	#change >> to echo command
+ 	slappasswd >> LDAPcapture.txt #we need to capture output of this command
+ 	 
+ 	 
+ 	#Copy DB_CONFIG from usr to var
+ 	echo "Coping DB_CONFIG.example..."
+ 	cp /usr/share/openldap-servers/DB_CONFIG.example /var/lib/ldap/DB_CONFIG
+ 	<<<<<<< patch-2
+ 	chown -R ldap:ldap /var/lib/ldap
+ 	echo "Coping finished"
+ 	 
+ 	#change >> to echo command
+ 	slappasswd >> LDAPcapture.txt #we need to capture output of this command
+ 	=======
+ 	chown -R ldap:ldap /var/lib/ldap
+ 	>>>>>>> master
+ 	 
+ 	#ldaprootpasswd.ldif
+ 	dn: olcDatabase={0}config,cn=config
+ 	changetype: modify
+ 	add: olcRootPW
+ 	olcRootPW: {SSHA}###########
+ 	#password goes at #
 
 
