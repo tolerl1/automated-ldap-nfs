@@ -4,21 +4,26 @@
 #Team 2
 #LDAP Instillation
 
+
+#store files in /etc/openldap/slapd.d
+
+
 #setsebool -P allow_ypbind=0 authlogin_nsswitch_use_ldap=0 (disables selinux auth)
 
 #Install LDAP
-yum install openldap-servers openldap-clients -y
+yum -y install openldap-servers openldap-clients
 
 #Starts LDAP and enables it to start on boot
 systemctl enable slapd.service
 systemctl start slapd.service
 
+#change >> to echo command
+slappasswd >> LDAPcapture.txt    #we need to capture output of this command
+
+
 #Copy DB_CONFIG from usr to var
 cp /usr/share/openldap-servers/DB_CONFIG.example /var/lib/ldap/DB_CONFIG
-chown -R ldap:ldap /var/lib/ldap
-
-#change >> to echo command
-slappasswd >> LDAPcapture.txt    #we need to capture output of this command 
+chown -R ldap:ldap /var/lib/ldap 
 
 #ldaprootpasswd.ldif
 dn: olcDatabase={0}config,cn=config
