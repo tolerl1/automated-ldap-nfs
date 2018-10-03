@@ -22,8 +22,7 @@
  	echo "`slapd.services status`"
  	 
  	#change >> to echo command
- 	slappasswd >> LDAPcapture.txt #we need to capture output of this command
- 	 
+ 	pass=$(slappasswd -s CIT470 -n) 	 
  	 
  	#Copy DB_CONFIG from usr to var
  	echo "Coping DB_CONFIG.example..."
