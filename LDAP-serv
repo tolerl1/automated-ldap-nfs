@@ -12,12 +12,9 @@
  	 
  	#Install LDAP
  	echo "Installing openldap..."
- 	yum install openldap-servers openldap-clients -y
- 	echo "Installation Complete!"
- 
  	yum -y install openldap-servers openldap-clients
- 	
- 	 
+ 	echo "Installation Complete!"
+  
  	#Starts LDAP and enables it to start on boot
  	echo "Starting slapd.services..."
  	systemctl enable slapd.service
