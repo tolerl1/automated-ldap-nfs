@@ -25,7 +25,8 @@ echo "LDAP started!"
  	 
 #make encrypted password
 echo "Generating encrypted password..."
-pass=$(slappasswd -s CIT470 -n) 	 
+pass=$(slappasswd -s CIT470 -n)
+pass1="CIT470" 	 
 sed -i "s@olcRootPW: @olcRootPW: $pass@g" db.ldif
 ldapmodify -Y EXTERNAL  -H ldapi:/// -f db.ldif
 echo "Password created!"	 
@@ -47,5 +48,15 @@ echo "Complete!"
 #add ldap tree
 echo "Adding LDAP tree..."
 ldapadd -x -W -D "cn=Manager,dc=cit470,dc=nku,dc=edu" -f base.ldif
-#echo "CIT470"
+expect -exact "password: "
+send "$pass1"
 echo "Complete!"
+
+#install diradm and create user
+cd /usr/local
+wget http://www.hits.at/diradm/diradm-1.3.tar.gz
+tar zxvf diradm-1.3.tar.gz
+cp /usr/local/diradm-1.3/diradm.conf /etc/
+./diradm useradd -c "LDAP Test Team2" -s /bin/bash -m -p "CIT470" team2
+expect -exact "password: "
+send "$pass1"
