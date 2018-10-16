@@ -50,7 +50,7 @@ echo "Complete!"
 #add ldap tree
 echo "Adding LDAP tree..."
 ldapadd -x -W -D "cn=Manager,dc=cit470,dc=nku,dc=edu" -f base.ldif
-expect -exact "password: "
+expect "Enter LDAP Password: "
 send "$pass1"
 echo "Complete!"
 
@@ -59,8 +59,9 @@ cd /usr/local
 wget http://www.hits.at/diradm/diradm-1.3.tar.gz
 tar zxvf diradm-1.3.tar.gz
 cp /usr/local/diradm-1.3/diradm.conf /etc/
+cd /usr/local/diradm-1.3/
 ./diradm useradd -c "LDAP Test Team2" -s /bin/bash -m -p "CIT470" team2
-expect -exact "password: "
+expect "Enter LDAP Password: "
 send "$pass1"
 
 #add acl
