@@ -62,3 +62,5 @@ cp /usr/local/diradm-1.3/diradm.conf /etc/
 ./diradm useradd -c "LDAP Test Team2" -s /bin/bash -m -p "CIT470" team2
 expect -exact "password: "
 send "$pass1"
+
+#add acl
