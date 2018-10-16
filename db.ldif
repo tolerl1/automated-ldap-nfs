@@ -11,4 +11,4 @@ olcRootDN: cn=Manager,dc=cit470,dc=nku,dc=edu
 dn: olcDatabase={2}hdb,cn=config
 changetype: modify
 replace: olcRootPW
-olcRootPW: hashed_output_from_the_slappasswd_command #echo encrypted passwd 
+olcRootPW: 

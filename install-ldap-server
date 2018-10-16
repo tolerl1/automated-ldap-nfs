@@ -1,48 +1,51 @@
 #!/bin/bash
- 	#Project 2
- 	#Author/Creator by Zachary Brewer & Loagn Toler
- 	#Team 2
- 	#LDAP Instillation
+#Project 2
+#Author/Creator by Zachary Brewer & Loagn Toler
+#Team 2
+#LDAP Installation
  	 
  	 
- 	#store files in /etc/openldap/slapd.d
+#store files in /etc/openldap/slapd.d
  	 
- 	 
- 	#setsebool -P allow_ypbind=0 authlogin_nsswitch_use_ldap=0 (disables selinux auth)
- 	 
- 	#Install LDAP
- 	echo "Installing openldap..."
- 	yum -y install openldap-servers openldap-clients
- 	echo "Installation Complete!"
-  
- 	#Starts LDAP and enables it to start on boot
- 	echo "Starting slapd.services..."
- 	systemctl enable slapd.service
- 	systemctl start slapd.service
- 	echo "`slapd.services status`"
- 	 
- 	#change >> to echo command
- 	pass=$(slappasswd -s CIT470 -n) 	 
- 	 
- 	#Copy DB_CONFIG from usr to var
- 	echo "Coping DB_CONFIG.example..."
- 	cp /usr/share/openldap-servers/DB_CONFIG.example /var/lib/ldap/DB_CONFIG
- 	
- 	chown -R ldap:ldap /var/lib/ldap
- 	echo "Coping finished"
-  
- 	#Create LDAP password
- 	#change >> to echo command
- 	slappasswd >> LDAPcapture.txt #we need to capture output of this command
- 	
- 	chown -R ldap:ldap /var/lib/ldap
- 	
- 	 
- 	#ldaprootpasswd.ldif
- 	dn: olcDatabase={0}config,cn=config
- 	changetype: modify
- 	add: olcRootPW
- 	olcRootPW: {SSHA}###########
- 	#password goes at #
+#setsebool -P allow_ypbind=0 authlogin_nsswitch_use_ldap=0 (disables selinux auth)
 
+firewall-cmd --zone=public --add-port=389/tcp --permanent
+firewall-cmd --reload
+ 	 
+#Install LDAP
+echo "Installing openldap..."
+yum -y install openldap-servers openldap-clients
+echo "Installation Complete!"
+  
+#Starts LDAP and enables it to start on boot
+echo "Starting slapd.services..."
+systemctl enable slapd.service
+systemctl start slapd.service
+echo "LDAP started!"
+ 	 
+#make encrypted password
+echo "Generating encrypted password..."
+pass=$(slappasswd -s CIT470 -n) 	 
+sed -i "s@olcRootPW: @olcRootPW: $pass@g" db.ldif
+ldapmodify -Y EXTERNAL  -H ldapi:/// -f db.ldif
+echo "Password created!"	 
 
+#Copy DB_CONFIG from usr to var
+echo "Copying DB_CONFIG.example..."
+cp /usr/share/openldap-servers/DB_CONFIG.example /var/lib/ldap/DB_CONFIG
+chown ldap:ldap /var/lib/ldap/*
+echo "Complete!"
+
+#add LDAP schemas
+echo "Adding LDAP Schemas..."
+ldapadd -Y EXTERNAL -H ldapi:/// -f /etc/openldap/schema/core.ldif
+ldapadd -Y EXTERNAL -H ldapi:/// -f /etc/openldap/schema/cosine.ldif
+ldapadd -Y EXTERNAL -H ldapi:/// -f /etc/openldap/schema/nis.ldif 
+ldapadd -Y EXTERNAL -H ldapi:/// -f /etc/openldap/schema/inetorgperson.ldif
+echo "Complete!"
+
+#add ldap tree
+echo "Adding LDAP tree..."
+ldapadd -x -W -D "cn=Manager,dc=cit470,dc=nku,dc=edu" -f base.ldif
+#echo "CIT470"
+echo "Complete!"

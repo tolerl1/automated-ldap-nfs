@@ -1,0 +1,3 @@
+#!/bin/bash
+pass=$(slappasswd -s CIT470 -n)
+sed -i "s@olcRootPW: @olcRootPW: $pass@g" db.ldif
