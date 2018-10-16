@@ -3,13 +3,15 @@
 #Author/Creator by Zachary Brewer & Loagn Toler
 #Team 2
 #LDAP Installation
- 	 
+
+yum -y install expect 	 
  	 
 #store files in /etc/openldap/slapd.d
  	 
 #setsebool -P allow_ypbind=0 authlogin_nsswitch_use_ldap=0 (disables selinux auth)
 
 firewall-cmd --zone=public --add-port=389/tcp --permanent
+firewall-cmd --zone=public --add-port=636/tcp --permanent
 firewall-cmd --reload
  	 
 #Install LDAP
