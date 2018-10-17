@@ -52,12 +52,8 @@ echo "LDAP schemas were successfully added!"
 
 #add ldap tree
 echo "Adding LDAP tree..."
-tree=$(expect -c ' spawn ldapadd -x -W -D "cn=Manager,dc=cit470,dc=nku,dc=edu" -f base.ldif
-expect "Enter LDAP Password: "
-send "CIT470\r"
-expect eof
-')
-echo "$tree"
+echo "CIT470" | ldapadd -x -W -D "cn=Manager,dc=cit470,dc=nku,dc=edu" -f base.ldif
+
 echo "Complete!"
 
 #install diradm and create user
