@@ -40,10 +40,7 @@ echo "Copy complete!"
 
 #add LDAP schemas
 echo "Adding LDAP Schemas..."
-ldapadd -Y EXTERNAL -H ldapi:/// -f /etc/openldap/schema/core.ldif
-ldapadd -Y EXTERNAL -H ldapi:/// -f /etc/openldap/schema/cosine.ldif
-ldapadd -Y EXTERNAL -H ldapi:/// -f /etc/openldap/schema/nis.ldif 
-ldapadd -Y EXTERNAL -H ldapi:/// -f /etc/openldap/schema/inetorgperson.ldif
+for def in core.ldif cosine.ldif nis.ldif inetorgperson.ldif; do ldapadd -H ldapi:/// -f /etc/openldap/schema/$def; done
 echo "LDAP schemas were successfully added!"
 
 #add ldap tree
@@ -62,8 +59,3 @@ cd /usr/local/diradm-1.3/
 expect "Enter LDAP Password: "
 send "$pass1\r"
 
-#add acl
-olc2="/etc/openldap/slapd.d/cn=config/olcDatabase={2}hdb.ldif"
-sed '20iolcAccess: {0}to attrs=userPassword, by self write by anonymous auth by * none' $olc2
-sed '21iolcAccess: {1} to * by self write by * read' $olc2
-systemctl restart slapd.service
