@@ -53,7 +53,7 @@ echo "LDAP schemas were successfully added!"
 
 #add ldap tree
 echo "Adding LDAP tree..."
-ldapadd -x -W -D "cn=Manager,dc=cit470,dc=nku,dc=edu" -f /etc/openldap/base.ldif
+ldapadd -x -D "cn=Manager,dc=cit470,dc=nku,dc=edu" -W -f /etc/openldap/base.ldif
 echo "Complete!"
 
 #install diradm and create user
