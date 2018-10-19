@@ -1,6 +1,10 @@
 #!/bin/bash
 
 yum -y install nfs-utils
+systemctl enable rpcbind
+systemctl enable nfs-server
+systemctl start rpcbind
+systemctl start nfs-server
 
 echo "Backing up home directory files..."
 mkdir /tmp/oldhome; cp -aR /home/* /tmp/oldhome
@@ -23,50 +27,32 @@ partprobe /dev/sda
 echo "Partition is succesfully Created."
 
 #Formating partition as an ext3 
-
-
 mkfs.xfs /dev/sda4 -f
 xfs_repair /dev/sda4
 echo "Format is Successful completed."
 
 echo " mounting new partition..."
 mount /dev/sda4 /home
-echo "Verifying the partition"
-ls -las /home
-echo "Unmounting the partition to test"
-umount /home
+echo "New partition mounted and named /dev/sda4 on /home"
 echo "editing the fstab file..."
 echo "/dev/sda4        /home    xfs    defaults    0 0" >> /etc/fstab
-echo "Completed."
-echo " mounting new partition..."
-mount /dev/sda4 
-
-
+echo "Completed." 
 
 echo "Restoring old home directory with permissions."
 cp -aR /tmp/oldhome/* /home
 echo "home directory is restored."
 
 echo "Editing the exports file..."
-echo "/home     10.2.7.229(rw,sync,no_root_squash,no_all_squash)" >> /etc/exports
-
-echo "starting the nfs service"
-service nfs start
-
+echo "/home 10.2.6.0/24(rw,sync,no_root_squash,no_all_squash)" >> /etc/exports
 echo "Exporting home directory"
 exportfs -a
 
-service nfs start
-
-echo "configuraing Firewall."
+echo "Configuring firewall."
 firewall-cmd --zone=public --add-port=2049/tcp --permanent
 firewall-cmd --zone=public --add-port=111/tcp --permanent
 firewall-cmd --zone=public --add-port=20048/tcp --permanent
 firewall-cmd --zone=public --add-port=2049/udp --permanent
 firewall-cmd --zone=public --add-port=111/udp --permanent
 firewall-cmd --zone=public --add-port=20048/udp --permanent
-
 firewall-cmd --reload
-echo "Verifying the firewall is configured"
-firewall-cmd --list-all
-
+echo "Firewall is configured"
