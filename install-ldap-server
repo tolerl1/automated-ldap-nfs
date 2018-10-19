@@ -5,16 +5,18 @@
 #LDAP Installation
 	 
  	 
-#store files in /etc/openldap/slapd.d
-wget studenthome.nku.edu/~tolerl1/base.ldif > /etc/openldap/
-wget studenthome.nku.edu/~tolerl1/db.ldif > /etc/openldap/
 
 #Install LDAP and other packages
 echo "Installing OpenLDAP Packages..."
 yum -y install openldap-servers openldap-clients migrationtools expect tcl
 echo "Installation Complete!"
 
-slappasswd -s CIT470 -n > /etc/openldap/passwd
+#store files in /etc/openldap/slapd.d
+
+wget -O /etc/openldap/base.ldif studenthome.nku.edu/~tolerl1/base.ldif
+wget -O /etc/openldap/db.ldif studenthome.nku.edu/~tolerl1/db.ldif
+
+#slappasswd -s CIT470 -n > /etc/openldap/passwd
 
 #Copy DB_CONFIG from usr to var
 echo "Copying DB_CONFIG.example..."
@@ -41,7 +43,7 @@ echo "Firewall configured!"
 #echo "Generating encrypted password..."
 #pass=$(slappasswd -s CIT470 -n)	 
 #sed -i "s@olcRootPW: @olcRootPW: $pass@g" db.ldif
-ldapmodify -Y EXTERNAL -H ldapi:/// -f /etc/openldap/db.ldif
+ldapmodify -a -x -D "cn=Manager,dc=cit470,dc=nku,dc=edu" -w CIT470 -H ldapi:// -f /etc/openldap/db.ldif
 #echo "Password created!"	 
 
 
@@ -52,9 +54,10 @@ for def in core.ldif cosine.ldif nis.ldif inetorgperson.ldif; do ldapadd -Y EXTE
 echo "LDAP schemas were successfully added!"
 
 #add ldap tree
-echo "Adding LDAP tree..."
-ldapadd -x -D "cn=Manager,dc=cit470,dc=nku,dc=edu" -W -f /etc/openldap/base.ldif
-echo "Complete!"
+#echo "Adding LDAP tree..."
+ldapadd -x -D "cn=Manager,dc=cit470,dc=nku,dc=edu" -w CIT470 -H ldap:// -f /etc/openldap/base.ldif
+#echo "Complete!"
+
 
 #install diradm and create user
 #cd /usr/local

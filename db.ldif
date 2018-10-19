@@ -11,10 +11,4 @@ olcRootDN: cn=Manager,dc=cit470,dc=nku,dc=edu
 dn: olcDatabase={2}hdb,cn=config
 changetype: modify
 replace: olcRootPW
-olcRootPW: {SSHA}tbB+R+Dj0+mGn1qYGXd10cIFrAIBMR00
-
-dn: olcDatabase={2}hdb,cn=config
-changetype: modify
-add: olcAccess
-olcAccess: {0}to attrs=userPassword, by self write by anonymous by * none
-olcAccess: {1}to * by self write by * read
+olcRootPW: CIT470
