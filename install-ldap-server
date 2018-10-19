@@ -8,20 +8,19 @@
 
 #Install LDAP and other packages
 echo "Installing OpenLDAP Packages..."
-yum -y install openldap-servers openldap-clients migrationtools expect tcl
+yum -y install openldap-servers openldap-clients migrationtools
 echo "Installation Complete!"
 
 #store files in /etc/openldap/slapd.d
 
-wget -O /etc/openldap/base.ldif studenthome.nku.edu/~tolerl1/base.ldif
-wget -O /etc/openldap/db.ldif studenthome.nku.edu/~tolerl1/db.ldif
+#wget -O /etc/openldap/base.ldif studenthome.nku.edu/~tolerl1/base.ldif
+#wget -O /etc/openldap/db.ldif studenthome.nku.edu/~tolerl1/db.ldif
 
 #slappasswd -s CIT470 -n > /etc/openldap/passwd
 
 #Copy DB_CONFIG from usr to var
 echo "Copying DB_CONFIG.example..."
 cp /usr/share/openldap-servers/DB_CONFIG.example /var/lib/ldap/DB_CONFIG
-slaptest
 chown ldap:ldap /var/lib/ldap/*
 echo "Copy complete!"
 
@@ -35,27 +34,56 @@ echo "Configuring LDAP firewall..."
 firewall-cmd --zone=public --add-port=389/tcp --permanent; firewall-cmd --zone=public --add-port=636/tcp --permanent; firewall-cmd --reload
 echo "Firewall configured!"
  	 
-
-  
+#add LDAP schemas
+echo "Adding LDAP Schemas..."
+for def in core.ldif cosine.ldif nis.ldif inetorgperson.ldif; do ldapadd -Y EXTERNAL -H ldapi:/// -f /etc/openldap/schema/$def; done
+echo "LDAP schemas were successfully added!"
+ 
 
 
 #make encrypted password
 #echo "Generating encrypted password..."
 #pass=$(slappasswd -s CIT470 -n)	 
 #sed -i "s@olcRootPW: @olcRootPW: $pass@g" db.ldif
-ldapmodify -a -x -D "cn=Manager,dc=cit470,dc=nku,dc=edu" -w CIT470 -H ldapi:// -f /etc/openldap/db.ldif
+ldapmodify -Q -Y EXTERNAL -H ldapi:/// <<EOF
+dn: olcDatabase={2}hdb,cn=config
+changetype: modify
+replace: olcSuffix
+olcSuffix: dc=cit470,dc=nku,dc=edu
+
+dn: olcDatabase={2}hdb,cn=config
+changetype: modify
+replace: olcRootDN
+olcRootDN: cn=Manager,dc=cit470,dc=nku,dc=edu
+
+dn: olcDatabase={2}hdb,cn=config
+changetype: modify
+replace: olcRootPW
+olcRootPW: CIT470
+
+EOF
 #echo "Password created!"	 
 
 
-
-#add LDAP schemas
-echo "Adding LDAP Schemas..."
-for def in core.ldif cosine.ldif nis.ldif inetorgperson.ldif; do ldapadd -Y EXTERNAL -H ldapi:/// -f /etc/openldap/schema/$def; done
-echo "LDAP schemas were successfully added!"
-
 #add ldap tree
 #echo "Adding LDAP tree..."
-ldapadd -x -D "cn=Manager,dc=cit470,dc=nku,dc=edu" -w CIT470 -H ldap:// -f /etc/openldap/base.ldif
+ldapadd -x -w CIT470 -D cn=Manager,dc=cit470,dc=nku,dc=edu -H ldap:/// <<EOF
+dn: dc=cit470,dc=nku,dc=edu
+dc: cit470
+objectClass: top
+objectClass: domain
+
+dn: ou=People,dc=cit470,dc=nku,dc=edu
+ou: People
+objectClass: top
+objectClass: organizationalUnit
+
+dn: ou=Group,dc=cit470,dc=nku,dc=edu
+ou: Group
+objectClass: top
+objectClass: organizationalUnit
+
+EOF
 #echo "Complete!"
 
 
