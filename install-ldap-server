@@ -6,41 +6,46 @@
 	 
  	 
 #store files in /etc/openldap/slapd.d
+#Install LDAP and other packages
+echo "Installing OpenLDAP Packages..."
+yum -y install openldap-servers openldap-clients migrationtools expect tcl
+echo "Installation Complete!"
 
-#removing SELinux complications
+slappasswd -s CIT470 -n > /etc/openldap/passwd
+
+#Copy DB_CONFIG from usr to var
+echo "Copying DB_CONFIG.example..."
+cp /usr/share/openldap-servers/DB_CONFIG.example /var/lib/ldap/DB_CONFIG
+slaptest
+chown ldap:ldap /var/lib/ldap/*
+echo "Copy complete!"
+
+#Starts LDAP and enables it to start on boot
+echo "Starting slapd.services..."
+systemctl enable slapd.service; systemctl start slapd.service
+echo "LDAP started!"
 
 #Configure firewall
 echo "Configuring LDAP firewall..." 
 firewall-cmd --zone=public --add-port=389/tcp --permanent; firewall-cmd --zone=public --add-port=636/tcp --permanent; firewall-cmd --reload
 echo "Firewall configured!"
  	 
-#Install LDAP and other packages
-echo "Installing openldap..."
-yum -y install openldap-servers openldap-clients expect tcl
-echo "Installation Complete!"
+
   
-#Starts LDAP and enables it to start on boot
-echo "Starting slapd.services..."
-systemctl enable slapd.service; systemctl start slapd.service
-echo "LDAP started!"
+
 
 #make encrypted password
-echo "Generating encrypted password..."
-pass=$(slappasswd -s CIT470 -n)
-pass1="CIT470" 	 
-sed -i "s@olcRootPW: @olcRootPW: $pass@g" db.ldif
-ldapmodify -Y EXTERNAL  -H ldapi:/// -f db.ldif
-echo "Password created!"	 
+#echo "Generating encrypted password..."
+#pass=$(slappasswd -s CIT470 -n)	 
+#sed -i "s@olcRootPW: @olcRootPW: $pass@g" db.ldif
+ldapmodify -Y EXTERNAL -H ldapi:/// -f db.ldif
+#echo "Password created!"	 
 
-#Copy DB_CONFIG from usr to var
-echo "Copying DB_CONFIG.example..."
-cp /usr/share/openldap-servers/DB_CONFIG.example /var/lib/ldap/DB_CONFIG
-chown ldap:ldap /var/lib/ldap/*
-echo "Copy complete!"
+
 
 #add LDAP schemas
 echo "Adding LDAP Schemas..."
-for def in core.ldif cosine.ldif nis.ldif inetorgperson.ldif; do ldapadd -H ldapi:/// -f /etc/openldap/schema/$def; done
+for def in core.ldif cosine.ldif nis.ldif inetorgperson.ldif; do ldapadd -Y EXTERNAL -H ldapi:/// -f /etc/openldap/schema/$def; done
 echo "LDAP schemas were successfully added!"
 
 #add ldap tree
@@ -56,6 +61,3 @@ tar zxvf diradm-1.3.tar.gz
 cp /usr/local/diradm-1.3/diradm.conf /etc/
 cd /usr/local/diradm-1.3/
 ./diradm useradd -c "LDAP Test Team2" -s /bin/bash -m -p "CIT470" team2
-expect "Enter LDAP Password: "
-send "$pass1\r"
-
