@@ -61,6 +61,12 @@ changetype: modify
 replace: olcRootPW
 olcRootPW: CIT470
 
+dn: olcDatabase={2}hdb,cn=config
+changetype: modify
+add: olcAccess
+olcAccess: {0}to attrs=userPassword, by self write by anonymous by * none
+olcAccess: {1}to * by self write by * read
+
 EOF
 #echo "Password created!"	 
 

@@ -3,10 +3,8 @@
 #Team2
 
 yum -y install nfs-utils
-systemctl enable rpcbind
-systemctl enable nfs-server
-systemctl start rpcbind
-systemctl start nfs-server
+systemctl enable rpcbind nfs-server
+systemctl start rpcbind nfs-server
 
 echo "Backing up home directory files..."
 mkdir /tmp/oldhome; cp -aR /home/* /tmp/oldhome
