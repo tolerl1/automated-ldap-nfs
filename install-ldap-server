@@ -8,13 +8,10 @@
 #store files in /etc/openldap/slapd.d
 
 #removing SELinux complications
-#setsebool -P allow_ypbind=0 authlogin_nsswitch_use_ldap=0 (disables selinux auth)
 
 #Configure firewall
 echo "Configuring LDAP firewall..." 
-firewall-cmd --zone=public --add-port=389/tcp --permanent
-firewall-cmd --zone=public --add-port=636/tcp --permanent
-firewall-cmd --reload
+firewall-cmd --zone=public --add-port=389/tcp --permanent; firewall-cmd --zone=public --add-port=636/tcp --permanent; firewall-cmd --reload
 echo "Firewall configured!"
  	 
 #Install LDAP and other packages
@@ -24,8 +21,7 @@ echo "Installation Complete!"
   
 #Starts LDAP and enables it to start on boot
 echo "Starting slapd.services..."
-systemctl enable slapd.service
-systemctl start slapd.service
+systemctl enable slapd.service; systemctl start slapd.service
 echo "LDAP started!"
 
 #make encrypted password
