@@ -1,36 +1,39 @@
 #!/bin/bash
-#Project 2
-#Author/Creator by Loagn Toler & Keni Patel
-#Team 2
-#LDAP Installation
+#LDAP Installation - Project 2
+#CIT470-001
+#Darci Guriel
+#Team 2,Loagn Toler, Keni Patel, Zach Brewers
+#10/23/2018
 
-#Install LDAP and other packages
-echo "Installing OpenLDAP Packages..." ; yum -y install openldap-servers openldap-clients migrationtools && echo "Installation Complete!"
+#initiate helper file
+if [ "$1" == "-h" ]; then echo "Usage: `basename $0` [Install LDAP Server. Script is invoked using the following command: ./install-ldap-server ; For further help contact cit470.fa2018.team.two@gmail.com]" ; exit 0 ; fi
 
-#install ldif config files
+#Installing LDAP packages
+echo "Installing OpenLDAP Packages..." ; yum -y install openldap-servers openldap-clients && echo "Installation Complete!"
+
+#Download ldif config files for ldapmodify
 echo "Downloading LDIF configuration files..." ; wget -O /etc/openldap/db.ldif http://studenthome.nku.edu/~tolerl1/db.ldif ; wget -O /etc/openldap/base.ldif http://studenthome.nku.edu/~tolerl1/base.ldif && echo "Download complete!"
 
 #Copy DB_CONFIG from usr to var
 echo "Copying DB_CONFIG.example..." ; cp /usr/share/openldap-servers/DB_CONFIG.example /var/lib/ldap/DB_CONFIG && chown ldap:ldap /var/lib/ldap/* && echo "Copy complete!"
 
-pass=$(slappasswd -s CIT470 -n) && sed -i "s/olcRootPW:/olcRootPW: $pass/g" /etc/openldap/db.ldif
+#create encrypted password and add to db.ldif
+echo "Creating encrypted password..." ; pass=$(slappasswd -s CIT470 -n) && echo "Encrypted password created and is being copied to db.ldif..." && sed -i "s/olcRootPW:/olcRootPW: $pass/g" /etc/openldap/db.ldif && echo "Copy complete!"
 
 #Starts LDAP and enables it to start on boot
 echo "Starting slapd.services..." ; systemctl enable slapd.service && systemctl start slapd.service && echo "LDAP started!"
 
-#Configure firewall
-echo "Configuring LDAP firewall..." 
-firewall-cmd --zone=public --add-port=389/tcp --permanent && firewall-cmd --zone=public --add-port=636/tcp --permanent && firewall-cmd --reload && echo "Firewall configured!"
+#Configure firewall ports for LDAP services
+echo "Configuring LDAP firewall..." ; firewall-cmd --zone=public --add-port=389/tcp --permanent && firewall-cmd --zone=public --add-port=636/tcp --permanent && firewall-cmd --reload && echo "Firewall configured!"
  	 
 #add LDAP schemas
 echo "Adding LDAP Schemas..." ; for def in core.ldif cosine.ldif nis.ldif inetorgperson.ldif; do ldapadd -Y EXTERNAL -H ldapi:/// -f /etc/openldap/schema/$def; done && echo "LDAP schemas were successfully added!"
 
-#Import domain info to olcDatabase{2}
+#Import domain info to olcDatabase{2} using ldapmodify
 echo "Importing domain information..." ; ldapmodify -Q -Y EXTERNAL -H ldapi:/// -f /etc/openldap/db.ldif && echo "Domain information imported successfully!"	 
 
-#add ldap tree/directory structure
+#add ldap tree/directory structure using ldapadd
 echo "Building the directory structure..." ; ldapadd -x -w CIT470 -D cn=Manager,dc=cit470,dc=nku,dc=edu -H ldap:/// -f /etc/openldap/base.ldif && echo "Complete!"
 
 #install diradm, configure the LDAP specific options in diradm.conf appropriately and copying diradm.conf to /etc/ , and create test user
-wget -O /usr/local/diradm-1.3.tar.gz http://www.hits.at/diradm/diradm-1.3.tar.gz && tar zxvf /usr/local/diradm-1.3.tar.gz -C /usr/local && sed -i 's@LDAPURI="ldap://localhost:389/"@LDAPURI="ldap://10.2.6.19:389/"@g' /usr/local/diradm-1.3/diradm.conf ; sed -i '/BINDDN="cn=Admin,o=System"/c\BINDDN="cn=Manager,dc=cit470,dc=nku,dc=edu"' /usr/local/diradm-1.3/diradm.conf ; sed -i '/USERBASE="ou=Users,ou=Accounts,o=System"/c\USERBASE="ou=People,dc=cit470,dc=nku,dc=edu"' /usr/local/diradm-1.3/diradm.conf ; sed -i '/GROUPBASE="ou=Groups,ou=Accounts,o=System"/c\GROUPBASE="ou=Group,dc=cit470,dc=nku,dc=edu"' /usr/local/diradm-1.3/diradm.conf && cp /usr/local/diradm-1.3/diradm.conf /etc/ && cd /usr/local/diradm-1.3/ && ./diradm useradd -c "LDAP Test Team2" -s /bin/bash -m -p "CIT470" team2
-
+echo "Downloading and installing diradm..." ; wget -O /usr/local/diradm-1.3.tar.gz http://www.hits.at/diradm/diradm-1.3.tar.gz && tar zxvf /usr/local/diradm-1.3.tar.gz -C /usr/local && echo "Download and install complete. Program is located in /usr/local/diradm-1.3" && echo "Configuring diradm.conf..." ; sed -i 's@LDAPURI="ldap://localhost:389/"@LDAPURI="ldap://10.2.6.19:389/"@g' /usr/local/diradm-1.3/diradm.conf ; sed -i '/BINDDN="cn=Admin,o=System"/c\BINDDN="cn=Manager,dc=cit470,dc=nku,dc=edu"' /usr/local/diradm-1.3/diradm.conf ; sed -i '/USERBASE="ou=Users,ou=Accounts,o=System"/c\USERBASE="ou=People,dc=cit470,dc=nku,dc=edu"' /usr/local/diradm-1.3/diradm.conf ; sed -i '/GROUPBASE="ou=Groups,ou=Accounts,o=System"/c\GROUPBASE="ou=Group,dc=cit470,dc=nku,dc=edu"' /usr/local/diradm-1.3/diradm.conf && cp /usr/local/diradm-1.3/diradm.conf /etc/ && echo "Configuration complete. Conf file was copied to /etc/." && echo "Creating test user..." ;  cd /usr/local/diradm-1.3/ && ./diradm useradd -c "LDAP Test Team2" -s /bin/bash -m -p "CIT470" team2 && echo "Test user: Team2, has been created!"
