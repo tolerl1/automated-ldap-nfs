@@ -1,0 +1,14 @@
+#!/bin/bash
+#Logan Toler
+#Team 2
+#User Creation Utility
+
+#help method, invoked by -h
+if [ "$1" == "-h" ]; then
+  echo "Usage: `basename $0` [User Creation Utility. Change values within script before running. Script is invoked using the following command: ./user-create ; For further help contact cit470.fa2018.team.two@gmail.com]"
+  exit 0
+fi
+
+#using diradm user management utility
+#change Full Name, Password, and username before running utility
+echo "Creating test user..." ; cd /usr/local/diradm-1.3/ && ./diradm useradd -c "Full Name" -s /bin/bash -m -p "Password" username && echo "User has been created!"
