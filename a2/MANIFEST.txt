@@ -1,0 +1,7 @@
+#Team 2 - Logan Toler, Keni Patel, Zach Brewer
+
+File: install-ldap-server
+Purpose: Automate LDAP install and configuration
+
+File: install-nfs-server
+Purpose: Automate NFS install and configuration
