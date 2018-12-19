@@ -1,8 +1,6 @@
 #!/bin/bash
-#NFS Installation - Project 2
-#CIT470-001
-#Darci Guriel
-#Team 2,Logan Toler, Keni Patel, Zach Brewers
+#NFS Installation
+#Logan Toler
 #10/23/2018
 
 #initiate helper file using -h
