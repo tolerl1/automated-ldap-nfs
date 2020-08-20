@@ -3,7 +3,7 @@
 #Logan Toler, Keni Patel
 
 #initiate helper file using -h
-if [ "$1" == "-h" ]; then echo "Usage: `basename $0` [Install NFS Server. Script is invoked using the following command: ./install-nfs-server ; For further help contact cit470.fa2018.team.two@gmail.com]" ; exit 0 ; fi | tee -a nfs-install.log
+if [ "$1" == "-h" ]; then echo "Usage: `basename $0` [Install NFS Server. Script is invoked using the following command: ./install-nfs-server]" ; exit 0 ; fi | tee -a nfs-install.log
 
 #install nfs package, start the services and enable them at boot
 echo "Install nfs package and enable the services..." | tee -a nfs-install.log ; yum -y install nfs-utils >& 1 >> nfs-install.log && systemctl enable rpcbind nfs-server >& 1 >> nfs-install.log ; systemctl start rpcbind nfs-server >& 1 >> nfs-install.log && echo "Operation complete." | tee -a nfs-install.log
