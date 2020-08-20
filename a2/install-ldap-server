@@ -3,13 +3,13 @@
 #Logan Toler, Keni Patel
 
 #initiate helper file using -h
-if [ "$1" == "-h" ]; then echo "Usage: `basename $0` [Install LDAP Server. Script is invoked using the following command: ./install-ldap-server ; For further help contact cit470.fa2018.team.two@gmail.com]" ; exit 0 ; fi | tee -a ldap-install.log
+if [ "$1" == "-h" ]; then echo "Usage: `basename $0` [Install LDAP Server. Script is invoked using the following command: ./install-ldap-server]" ; exit 0 ; fi | tee -a ldap-install.log
 
 #Installing LDAP packages
 echo "Installing OpenLDAP Packages..." | tee -a ldap-install.log ; yum -y install openldap-servers openldap-clients >& 1 >> ldap-install.log && echo "Installation Complete!" | tee -a ldap-install.log
 
 #Download ldif config files for ldapmodify. LDIF files modify the olcDatabase{2} file
-echo "Downloading LDIF configuration files..." | tee -a ldap-install.log ; wget -O /etc/openldap/db.ldif http://studenthome.nku.edu/~tolerl1/db.ldif >& 1 >> ldap-install.log ; wget -O /etc/openldap/base.ldif https://studenthome.nku.edu/~tolerl1/base.ldif >& 1 >> ldap-install.log && echo "Download complete!" | tee -a ldap-install.log
+echo "Downloading LDIF configuration files..." | tee -a ldap-install.log ; wget -O /etc/openldap/db.ldif https://******/user/db.ldif >& 1 >> ldap-install.log ; wget -O /etc/openldap/base.ldif https://******/user/base.ldif >& 1 >> ldap-install.log && echo "Download complete!" | tee -a ldap-install.log
 
 #Copy DB_CONFIG from usr to var
 echo "Copying DB_CONFIG.example..." | tee -a ldap-install.log ; cp /usr/share/openldap-servers/DB_CONFIG.example /var/lib/ldap/DB_CONFIG >& 1 >> ldap-install.log && chown ldap:ldap /var/lib/ldap/* >& 1 >> ldap-install.log && echo "Copy complete!" | tee -a ldap-install.log
