@@ -1,11 +1,10 @@
 #!/bin/bash
-#Logan Toler
-#Team 2
 #User Creation Utility
+#Logan Toler
 
 #help method, invoked by -h
 if [ "$1" == "-h" ]; then
-  echo "Usage: `basename $0` [User Creation Utility. Change values within script before running. Script is invoked using the following command: ./user-create ; For further help contact cit470.fa2018.team.two@gmail.com]"
+  echo "Usage: `basename $0` [User Creation Utility. Change values within script before running. Script is invoked using the following command: ./user-create]"
   exit 0
 fi
 
