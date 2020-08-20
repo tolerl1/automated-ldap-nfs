@@ -1,4 +1,4 @@
-#Team 2 - Logan Toler, Keni Patel, Zach Brewer
+#Logan Toler, Keni Patel
 
 File: install-ldap-server
 Purpose: Automate LDAP install and configuration
