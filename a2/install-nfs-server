@@ -1,9 +1,6 @@
 #!/bin/bash
-#NFS Installation - Project 2
-#CIT470-001
-#Darci Guriel
-#Team 2,Logan Toler, Keni Patel, Zach Brewers
-#10/23/2018
+#NFS Installation
+#Logan Toler, Keni Patel
 
 #initiate helper file using -h
 if [ "$1" == "-h" ]; then echo "Usage: `basename $0` [Install NFS Server. Script is invoked using the following command: ./install-nfs-server ; For further help contact cit470.fa2018.team.two@gmail.com]" ; exit 0 ; fi | tee -a nfs-install.log
